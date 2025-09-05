@@ -51,20 +51,33 @@ This demo shows a simple **membership inference attack** on a word-level LSTM la
 
 ### Usage
 
-From the `membership/src` root, run:
+From the `membership/src` root:
+
+1. Build a synthetic corpus of sentences:
 
 ```bash
-# Build synthetic corpus
 python build_corpus.py --n 2000 --out synthetic_corpus
+```
 
-# Train a small LSTM LM on 70% (members)
+2. Train a small LSTM LM on 70% (members):
+
+```bash
 python train_lm.py --corpus synthetic_corpus_2000 --epochs 500
+```
 
-# Run membership inference attack
+3. Run membership inference attack:
+
+```bash
 python attack.py --corpus synthetic_corpus_2000 --checkpoint lm_2000_500
 ```
 
-The attack reports **ROC-AUC** for distinguishing training vs held-out sentences, prints score `.csv` and records loss distribution histogram and ROC plots in the folder with current date and time under the `membership/resource/runs` directory.
+The attack reports **ROC-AUC** for distinguishing training vs held-out sentences, prints score `.csv` and records loss distribution histogram and ROC plots in the folder with current date and time under the `membership/resource/runs` directory. For example, for a run with the parameters above, here's the loss distribution histogram:
+
+![](./membership/resource/runs/20250906/015416/synthetic_corpus_2000__lm_2000_500/plot/loss_histogram.png)
+
+And here's the ROC curve:
+
+![](./membership/resource/runs/20250906/015416/synthetic_corpus_2000__lm_2000_500/plot/roc_curve.png)
 
 For convenience, there are a couple of pre-trained checkpoints and synthetic corpora in the `membership/resource` directory.
 
