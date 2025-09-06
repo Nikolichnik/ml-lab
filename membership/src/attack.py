@@ -168,8 +168,6 @@ if __name__ == "__main__":
     scores = -np.concatenate([train_losses, held_losses])
     mia_auc = roc_auc_score(y_true, scores)
 
-    print(f"Membership Inference AUC (loss-threshold): {mia_auc:.3f} (1.0 perfect, 0.5 random)")
-
     # Sentences to score
     if args.input.strip():
         sentences = args.input.strip().split("|")
@@ -218,6 +216,12 @@ if __name__ == "__main__":
 
     df = pd.DataFrame(results)
     df.to_csv(csv_path, index=False)
+
+    print("Data:")
+    print(f"    - Checkpoint:               {args.checkpoint}")
+    print(f"    - Membership Inference AUC: {mia_auc:.3f} (1.0 perfect, 0.5 random)")
+    print(f"    - Train size:               {len(train_ds)}")
+    print(f"    - Held-out size:            {len(held_ds)}")
 
     print_csv_table(
         path=csv_path,

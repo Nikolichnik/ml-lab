@@ -130,6 +130,19 @@ def print_table(
 
         return text[:max_width - 3] + "..."
 
+    def create_line(join_with: str, col_widths: list[int]) -> str:
+        """
+        Create a line of repeated characters for table borders.
+
+        Args:
+            join_with (str): The string to join the segments with.
+            col_widths (list[int]): The widths of each column.
+
+        Returns:
+            str: The constructed line.
+        """
+        return join_with.join("─" * col_width for col_width in col_widths)
+
     # Ensure all rows have the same number of columns as headers
     num_columns = len(headers)
     normalized_rows = []
@@ -152,17 +165,19 @@ def print_table(
     ]
 
     header_line = " │ ".join(f"{header:<{col_widths[i]}}" for i, header in enumerate(truncated_headers))
-    separator_line = "─┼─".join("─" * col_width for col_width in col_widths)
 
     for _ in range(padding):
         print()
 
+    print(create_line("─┬─", col_widths))
     print(header_line)
-    print(separator_line)
+    print(create_line("─┼─", col_widths))
 
     for row in truncated_rows:
         row_line = " │ ".join(f"{str(item):<{col_widths[i]}}" for i, item in enumerate(row))
         print(row_line)
+
+    print(create_line("─┴─", col_widths))
 
     for _ in range(padding):
         print()
