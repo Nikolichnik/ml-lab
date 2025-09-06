@@ -13,13 +13,33 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 
-from common.constants import ENCODING_UTF8
+from common.constants import ENCODING_UTF8, DIR_LOGOS, LOGO_DEFAULT
 
 from util.path import get_resource_path, ensure_dir
 
 
 matplotlib.use("Agg")
 
+
+def get_resource_files(
+    *children: str,
+) -> list[str]:
+    """
+    Get all file names in a resource directory.
+
+    Args:
+        *children (str): Subdirectories to append to the base resource path.
+
+    Returns:
+        list[str]: Sorted list of file names in the directory.
+    """
+    dir_path = get_resource_path(*children)
+    p = pathlib.Path(dir_path)
+
+    if not p.exists() or not p.is_dir():
+        return []
+
+    return sorted([f.name for f in p.iterdir() if f.is_file()])
 
 def read_resource_file(
     *children: str,
@@ -62,6 +82,18 @@ def write_resource_file(
     ensure_dir(dir_path)
 
     pathlib.Path(file_path).write_text(content, encoding=encoding)
+
+
+def print_logo(variant: str = LOGO_DEFAULT) -> None:
+    """
+    Print the logo by reading its content from the resource directory.
+
+    Args:
+        variant (str): The logo to print.
+    """
+    logo_content = read_resource_file(DIR_LOGOS, variant)
+
+    print(f"\n{logo_content}\n")
 
 
 def print_table(
@@ -135,10 +167,13 @@ def print_table(
     for _ in range(padding):
         print()
 
+
 def print_csv_table(
     path: str,
     separator: str = ",",
     max_column_width: int = 80,
+    percentage_columns: list[str] = None,
+    highlight_threshold: float = 70.0,
 ) -> None:
     """
     Print a CSV file as a formatted table to the console using pandas.
@@ -147,23 +182,70 @@ def print_csv_table(
         path (str): The path to the CSV file.
         separator (str): The delimiter used in the CSV file.
         max_column_width (int): Maximum width of a table column.
+        percentage_columns (list[str]): Column names to format as percentages for display.
+        highlight_threshold (float): Threshold for highlighting percentage values.
 
     Returns:
         None
     """
+    # ANSI color codes
+    BOLD = "\033[1m"
+    RED = "\033[91m"
+    RESET = "\033[0m"
+
+    def highlight_percentage(value: float, threshold: float) -> str:
+        """
+        Apply color highlighting to percentage values above threshold.
+
+        Args:
+            value (float): The percentage value.
+            threshold (float): The threshold for highlighting.
+
+        Returns:
+            str: The formatted (and possibly highlighted) percentage string.
+        """
+        formatted_value = f"{value:.1f}"
+
+        if value >= threshold:
+            return f"{BOLD}{RED}{formatted_value}{RESET}"
+
+        return formatted_value
+
     try:
         # Read CSV with pandas
         df = pd.read_csv(get_resource_path(path), sep=separator)
 
         if df.empty:
             print("No data to display.")
+
             return
 
+        # Create a copy for display formatting (don't modify original)
+        display_df = df.copy()
+
+        # Format specified columns as percentages
+        if percentage_columns:
+            for col in percentage_columns:
+                if col in display_df.columns:
+                    display_df[col] = display_df[col].apply(
+                        lambda x: highlight_percentage(x * 100, highlight_threshold)
+                    )
+
         # Convert to the format expected by print_table
-        headers = [str(col).strip().replace("_", " ").capitalize() for col in df.columns]
+        headers = []
+
+        for col in display_df.columns:
+            header = str(col).strip().capitalize().replace("_", " ")
+
+            # Add [%] suffix to percentage column headers
+            if percentage_columns and col in percentage_columns:
+                header += " [%]"
+
+            headers.append(header)
+
         rows = [
-            [str(item) for item in row] 
-            for row in df.values
+            [str(item) for item in row]
+            for row in display_df.values
         ]
 
         print_table(headers, rows, max_column_width=max_column_width)

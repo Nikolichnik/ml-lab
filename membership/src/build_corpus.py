@@ -13,7 +13,9 @@ from bs4 import BeautifulSoup
 from common.constants import (
     NEWLINE,
     EXTENSION_TXT,
-    DIR_CORPUS,
+    DIR_CORPORA,
+    CORPUS_NAME_PREFIX_DEFAULT,
+    CORPUS_NAME_PREFIX_WEB,
 )
 from common.exception import WebScrapingException
 
@@ -23,7 +25,7 @@ from util.io import write_resource_file
 ARGUMENTS_MAP = {
     "url": (str, "URL to scrape content from (optional).", ""),
     "n": (int, "Number of sentences to generate.", 2000),
-    "name-prefix": (str, "Corpus file name prefix.", "synthetic"),
+    "name-prefix": (str, "Corpus file name prefix.", CORPUS_NAME_PREFIX_DEFAULT),
 }
 
 # pylint: disable=line-too-long
@@ -160,14 +162,14 @@ if __name__ == "__main__":
 
     args = parse_arguments(ARGUMENTS_MAP, "Builds a corpus from synthetic generation or web scraping.")
 
-    name_prefix = args.name_prefix or "web" if args.url else "synthetic"
+    name_prefix = args.name_prefix or CORPUS_NAME_PREFIX_WEB if args.url else CORPUS_NAME_PREFIX_DEFAULT
     name_suffix = f"_{args.n}" if not args.url else ""
     output_file = f"{name_prefix}{name_suffix}{EXTENSION_TXT}"
 
     corpus = build_corpus(url=args.url, n=args.n)
 
     write_resource_file(
-        DIR_CORPUS,
+        DIR_CORPORA,
         output_file,
         content=corpus,
     )
