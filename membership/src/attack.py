@@ -20,7 +20,7 @@ import pandas as pd
 from common.constants import (
     DEVICE_CUDA,
     DEVICE_CPU,
-    DIR_DATA,
+    DIR_CORPUS,
     DIR_CHECKPOINTS,
     DIR_RUNS,
     EXTENSION_TXT,
@@ -28,6 +28,7 @@ from common.constants import (
     EXTENSION_CSV,
     DATE_FORMAT,
     TIME_FORMAT,
+    SPACER_DEFAULT,
 )
 
 from dataset.lm_dataset import LMDataset, collate_batch
@@ -42,10 +43,10 @@ from util.io import read_resource_file, print_csv_table, save_plots
 
 
 ARGUMENTS_MAP = {
-    "corpus": (str, "Corpus to use.", "synthetic_corpus_2000"),
-    "checkpoint": (str, "Checkpoint to load.", "lm_2000_5"),
-    "batch_size": (int, "Batch size for training.", 64),
-    "input": (str, "Input text for evaluation.", ""),
+    "checkpoint": (str, "Checkpoint to load.", f"synthetic_2000{SPACER_DEFAULT}100"),
+    "corpus": (str, "Corpus to use. Optional, if not provided, attempt to resolve it from the checkpoint name will be made.", ""),
+    "batch-size": (int, "Batch size for training.", 64),
+    "input": (str, "Input text for evaluation. Optional. If not provided, a set of example sentences will be used.", ""),
 }
 
 DEVICE = DEVICE_CUDA if is_cuda_available() else DEVICE_CPU
@@ -133,8 +134,13 @@ def score_sentence(
 if __name__ == "__main__":
     args = parse_arguments(ARGUMENTS_MAP, "Performs membership inference attack on language models.")
 
+    corpus_name = args.corpus or args.checkpoint.split(SPACER_DEFAULT)[0] if SPACER_DEFAULT in args.checkpoint else None
+
+    if not corpus_name:
+        raise ValueError("Corpus name could not be determined.")
+
     # Load corpus and split (train = members, held-out = non-members)
-    lines = read_resource_file(DIR_DATA, f"{args.corpus}{EXTENSION_TXT}").splitlines()
+    lines = read_resource_file(DIR_CORPUS, f"{corpus_name}{EXTENSION_TXT}").splitlines()
     n = len(lines)
     n_train = int(0.7 * n)
     train_lines = lines[:n_train]
@@ -204,7 +210,7 @@ if __name__ == "__main__":
     now = datetime.now()
     current_date = now.strftime(DATE_FORMAT)
     current_time = now.strftime(TIME_FORMAT)
-    output_dir = f"{get_resource_path(DIR_RUNS)}/{current_date}/{current_time}/{args.corpus}__{args.checkpoint}"
+    output_dir = f"{get_resource_path(DIR_RUNS)}/{current_date}/{current_time}{SPACER_DEFAULT}{args.checkpoint}"
     output_file = f"output{EXTENSION_CSV}"
 
     ensure_dir(output_dir)
