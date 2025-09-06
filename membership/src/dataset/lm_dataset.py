@@ -1,20 +1,46 @@
+"""
+LM dataset and utilities.
+"""
+
 import re
-from torch.utils.data import Dataset
+
 import torch
+from torch import Tensor
+from torch.utils.data import Dataset
 
 from vocab.vocab import Vocab
 
 
-def tokenize(s):
+def tokenize(s: str) -> list[str]:
+    """
+    Tokenizes input string into a list of tokens.
+
+    Args:
+        s (str): The input string.
+
+    Returns:
+        list[str]: List of tokens.
+    """
     s = s.lower().strip()
     s = re.sub(r"[^a-z0-9\s\.]", "", s)
     s = s.replace(".", " .")
-    toks = s.split()
+    tokens = s.split()
 
-    return toks
+    return tokens
 
 
-def collate_batch(batch):
+def collate_batch(batch: list[Tensor]) -> tuple[Tensor, Tensor, Tensor]:
+    """
+    Collates a batch of sequences into a padded tensor.
+
+    Args:
+        batch (list[Tensor]): List of 1D tensors (sequences of token indices
+                              of varying lengths).
+
+    Returns:
+        tuple[Tensor, Tensor, Tensor]: Padded input tensor (xs), target tensor (ys),
+                                       and mask tensor.
+    """
     maxlen = max(len(x) for x in batch)
     pad = 0
     xs = torch.full((len(batch), maxlen), pad, dtype=torch.long)
@@ -29,6 +55,9 @@ def collate_batch(batch):
     return xs, ys, mask
 
 class LMDataset(Dataset):
+    """
+    Language Model Dataset.
+    """
     def __init__(self, lines, vocab=None):
         token = []
 

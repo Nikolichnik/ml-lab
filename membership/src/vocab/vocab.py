@@ -6,6 +6,9 @@ from collections import Counter
 
 
 class Vocab:
+    """
+    Vocabulary class for token to index mapping and vice versa.
+    """
     def __init__(self, tokens, min_freq=1):
         cnt = Counter(tokens)
         self.itos = ["<pad>","<bos>","<eos>","<unk>"]
@@ -16,10 +19,28 @@ class Vocab:
 
         self.stoi = {t:i for i,t in enumerate(self.itos)}
 
-    def encode(self, tokens):
+    def encode(self, tokens: list[str]) -> list[int]:
+        """
+        Encode a list of tokens to their corresponding indices.
+
+        Args:
+            tokens (list[str]): List of tokens to encode.
+
+        Returns:
+            list[int]: List of token indices.
+        """
         return [self.stoi.get(t, self.stoi["<unk>"]) for t in tokens]
 
-    def decode(self, ids):
+    def decode(self, ids: list[int]) -> list[str]:
+        """
+        Decode a list of token indices to their corresponding tokens.
+
+        Args:
+            ids (list[int]): List of token indices to decode.
+
+        Returns:
+            list[str]: List of decoded tokens.
+        """
         return [self.itos[i] for i in ids]
 
 
@@ -46,9 +67,27 @@ class RestoredVocab:
             # rebuild stoi
             self.stoi = {t: i for i, t in enumerate(self.itos)}
 
-    def encode(self, tokens):
+    def encode(self, tokens: list[str]) -> list[int]:
+        """
+        Encode a list of tokens to their corresponding indices.
+
+        Args:
+            tokens (list[str]): List of tokens to encode.
+
+        Returns:
+            list[int]: List of token indices.
+        """
         unk = self.stoi.get("<unk>", 0)
         return [self.stoi.get(t, unk) for t in tokens]
 
-    def decode(self, ids):
+    def decode(self, ids: list[int]) -> list[str]:
+        """
+        Decode a list of token indices to their corresponding tokens.
+
+        Args:
+            ids (list[int]): List of token indices to decode.
+
+        Returns:
+            list[str]: List of decoded tokens.
+        """
         return [self.itos[i] if 0 <= i < len(self.itos) else "<unk>" for i in ids]
