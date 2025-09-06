@@ -23,3 +23,6 @@ Pipfile.lock
 .idea/
 *.sublime-project
 *.sublime-workspace
+
+# Output folders
+membership/resource/

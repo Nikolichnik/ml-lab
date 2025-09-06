@@ -7,7 +7,7 @@ DEVICE_CUDA = "cuda"
 DEVICE_CPU = "cpu"
 
 DIR_RESOURCE = "resource"
-DIR_DATA = "data"
+DIR_CORPUS = "corpus"
 DIR_CHECKPOINTS = "checkpoints"
 DIR_RUNS = "runs"
 
@@ -24,3 +24,5 @@ ENCODING_UTF8 = "utf-8"
 
 DATE_FORMAT = "%Y%m%d"
 TIME_FORMAT = "%H%M%S"
+
+SPACER_DEFAULT = "__"

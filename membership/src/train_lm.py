@@ -13,10 +13,11 @@ from common.constants import (
     DEVICE_CPU,
     KEY_MODEL,
     KEY_VOCAB,
-    DIR_DATA,
+    DIR_CORPUS,
     DIR_CHECKPOINTS,
     EXTENSION_TXT,
     EXTENSION_PT,
+    SPACER_DEFAULT,
 )
 
 from util.arguments import parse_arguments
@@ -29,11 +30,11 @@ from lm.word_lstm import WordLSTM
 
 
 ARGUMENTS_MAP = {
-    "corpus": (str, "Corpus to use.", "synthetic_corpus_2000"),
-    "epochs": (int, "Number of training epochs.", 5),
-    "batch_size": (int, "Batch size for training.", 64),
-    "learning_rate": (float, "Learning rate.", 2e-3),
-    "name": (str, "Model checkpoint name.", "lm")
+    "corpus": (str, "Corpus to use.", "synthetic_2000"),
+    "epochs": (int, "Number of training epochs.", 100),
+    "batch-size": (int, "Batch size for training.", 64),
+    "learning-rate": (float, "Learning rate.", 2e-3),
+    "name-prefix": (str, "Model checkpoint name prefix.", "")
 }
 
 DEVICE = DEVICE_CUDA if is_cuda_available() else DEVICE_CPU
@@ -64,11 +65,11 @@ def loss_for_batch(
     return seq_loss.mean()
 
 if __name__ == "__main__":
-    args = parse_arguments(ARGUMENTS_MAP)
+    args = parse_arguments(ARGUMENTS_MAP, "Trains a language model on a text corpus.")
 
     print(f"Training LM on {args.corpus} for {args.epochs} epochs using {DEVICE}.")
 
-    text = read_resource_file(DIR_DATA, f"{args.corpus}{EXTENSION_TXT}").splitlines()
+    text = read_resource_file(DIR_CORPUS, f"{args.corpus}{EXTENSION_TXT}").splitlines()
     n = len(text)
     n_train = int(0.7 * n)
     train_lines = text[:n_train]
@@ -106,7 +107,8 @@ if __name__ == "__main__":
 
         print(f"Epoch {epoch}: train_loss={total/max(1, steps):.4f}")
 
-    output_path = f"{get_resource_path(DIR_CHECKPOINTS)}/{args.name}_{n}_{args.epochs}{EXTENSION_PT}"
+    name_prefix = f"{args.name_prefix}{SPACER_DEFAULT}" if args.name_prefix else ""
+    output_path = f"{get_resource_path(DIR_CHECKPOINTS)}/{name_prefix}{args.corpus}{SPACER_DEFAULT}{args.epochs}{EXTENSION_PT}"
 
     save(
         obj={
