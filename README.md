@@ -17,10 +17,10 @@ A compact, production‑minded ML lab consisting of two main sections - a demo o
 │   ├── fgsm.py                # FGSM adversarial attack
 │   ├── calibration.py         # Model calibration
 │   └── watermark.py           # Watermarking
-├── 📁 membership              # Membership inference attack POC section of the lab
+├── 📁 membership              # Membership inference attack POC section of the lab - WhisperTrace
 │   ├── 📁 resource            # Pre-trained models and synthetic corpora
 │   │   ├── 📁 checkpoints     # Trained models' checkpoints
-│   │   ├── 📁 corpus          # This is where synthetic and scraped corpora are stored
+│   │   ├── 📁 corpora         # This is where synthetic and scraped corpora are stored
 │   │   └── 📁 runs            # Attack results (plots, scores), organized by date and time
 │   └── 📁 src                 # Source code
 │       ├── 📁 common          # Common functions and variables
@@ -97,7 +97,7 @@ python watermark.py
 
 Datasets are auto‑downloaded with `torchvision`. If offline, pre‑download to `~/.torch` or mirror locally.
 
-## Membership Inference Attack Section
+## Membership Inference Attack Section - WhisperTrace
 
 This demo shows a simple **membership inference attack** on a word-level LSTM language model trained on synthetic text.
 
@@ -105,7 +105,13 @@ This demo shows a simple **membership inference attack** on a word-level LSTM la
 
 From the `membership/src` root:
 
-1. Build a corpus of sentences:  
+1. List available resources (corpora and checkpoints):
+
+```bash
+python list_resources.py
+```
+
+2. Build a corpus of sentences:  
     1.1 You can either build a synthetic corpus of `n` sentences:
 
     ```bash
@@ -118,13 +124,13 @@ From the `membership/src` root:
     python build_corpus.py --url "https://en.wikipedia.org/wiki/Landau%E2%80%93Lifshitz%E2%80%93Gilbert_equation" --name-prefix wiki_llg_equation
     ```
 
-2. Train a small LSTM LM on 70% (members) on previously built corpus:
+3. Train a small LSTM LM on 70% (members) on previously built corpus:
 
 ```bash
 python train_lm.py --corpus synthetic_2000 --epochs 100
 ```
 
-3. Run membership inference attack:
+4. Run membership inference attack:
 
 ```bash
 python attack.py --checkpoint synthetic_2000__100

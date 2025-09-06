@@ -13,7 +13,7 @@ from common.constants import (
     DEVICE_CPU,
     KEY_MODEL,
     KEY_VOCAB,
-    DIR_CORPUS,
+    DIR_CORPORA,
     DIR_CHECKPOINTS,
     EXTENSION_TXT,
     EXTENSION_PT,
@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
     print(f"Training LM on {args.corpus} for {args.epochs} epochs using {DEVICE}.")
 
-    text = read_resource_file(DIR_CORPUS, f"{args.corpus}{EXTENSION_TXT}").splitlines()
+    text = read_resource_file(DIR_CORPORA, f"{args.corpus}{EXTENSION_TXT}").splitlines()
     n = len(text)
     n_train = int(0.7 * n)
     train_lines = text[:n_train]

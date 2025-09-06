@@ -4,6 +4,8 @@ Argument parsing utilities.
 
 import argparse
 
+from util.io import print_logo
+
 
 def parse_arguments(argument_map: dict, description: str = None) -> argparse.Namespace:
     """
@@ -41,7 +43,7 @@ def parse_arguments(argument_map: dict, description: str = None) -> argparse.Nam
 
     # Track used short options to avoid conflicts
     used_short_options = {'h'}  # help is already used
-    
+
     for arg, (arg_type, arg_description, default) in argument_map.items():
         # Generate unique short option
         short_option = None
@@ -70,9 +72,14 @@ def parse_arguments(argument_map: dict, description: str = None) -> argparse.Nam
             )
 
     try:
+        print_logo()
         args = parser.parse_args()
+
         return args
     except SystemExit as e:
-        # argparse calls sys.exit() for --help or invalid arguments
-        # Re-raise to maintain standard behavior
+        # Always print help when argparse exits
+        if e.code != 0:
+            print("\nInvalid arguments. See usage below:\n")
+            parser.print_help()
+
         raise e

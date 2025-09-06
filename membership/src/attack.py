@@ -20,7 +20,7 @@ import pandas as pd
 from common.constants import (
     DEVICE_CUDA,
     DEVICE_CPU,
-    DIR_CORPUS,
+    DIR_CORPORA,
     DIR_CHECKPOINTS,
     DIR_RUNS,
     EXTENSION_TXT,
@@ -140,7 +140,7 @@ if __name__ == "__main__":
         raise ValueError("Corpus name could not be determined.")
 
     # Load corpus and split (train = members, held-out = non-members)
-    lines = read_resource_file(DIR_CORPUS, f"{corpus_name}{EXTENSION_TXT}").splitlines()
+    lines = read_resource_file(DIR_CORPORA, f"{corpus_name}{EXTENSION_TXT}").splitlines()
     n = len(lines)
     n_train = int(0.7 * n)
     train_lines = lines[:n_train]

@@ -13,13 +13,33 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 
-from common.constants import ENCODING_UTF8
+from common.constants import ENCODING_UTF8, DIR_LOGOS, LOGO_DEFAULT
 
 from util.path import get_resource_path, ensure_dir
 
 
 matplotlib.use("Agg")
 
+
+def get_resource_files(
+    *children: str,
+) -> list[str]:
+    """
+    Get all file names in a resource directory.
+
+    Args:
+        *children (str): Subdirectories to append to the base resource path.
+
+    Returns:
+        list[str]: Sorted list of file names in the directory.
+    """
+    dir_path = get_resource_path(*children)
+    p = pathlib.Path(dir_path)
+
+    if not p.exists() or not p.is_dir():
+        return []
+
+    return sorted([f.name for f in p.iterdir() if f.is_file()])
 
 def read_resource_file(
     *children: str,
@@ -62,6 +82,18 @@ def write_resource_file(
     ensure_dir(dir_path)
 
     pathlib.Path(file_path).write_text(content, encoding=encoding)
+
+
+def print_logo(variant: str = LOGO_DEFAULT) -> None:
+    """
+    Print the logo by reading its content from the resource directory.
+
+    Args:
+        variant (str): The logo to print.
+    """
+    logo_content = read_resource_file(DIR_LOGOS, variant)
+
+    print(f"\n{logo_content}\n")
 
 
 def print_table(

@@ -25,4 +25,4 @@ Pipfile.lock
 *.sublime-workspace
 
 # Output folders
-membership/resource/
+# membership/resource/
