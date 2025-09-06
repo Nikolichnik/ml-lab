@@ -99,7 +99,9 @@ Datasets are auto‑downloaded with `torchvision`. If offline, pre‑download to
 
 ## Membership Inference Attack Section - WhisperTrace
 
-This demo shows a simple **membership inference attack** on a word-level LSTM language model trained on synthetic text.
+This demo shows a simple **membership inference attack** on a word-level LSTM language model trained on synthetic text. In practice, this can be used as a POC for IP protection of text data and models trained on it.
+
+In short, the attack works by comparing the loss distributions of training vs held-out sentences. If the distributions are sufficiently different, a threshold can be found to distinguish between training and held-out sentences with a good degree of accuracy (measured by ROC-AUC). In other words, if a sentence has a low loss, it is likely to be from the training set, while if it has a high loss, it is likely to be from the held-out set.
 
 ### Usage
 

@@ -221,6 +221,7 @@ if __name__ == "__main__":
 
     print_csv_table(
         path=csv_path,
+        percentage_columns=["normalized_score"],
     )
 
     save_plots(
